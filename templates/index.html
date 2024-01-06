@@ -132,12 +132,50 @@ Arrival Time - 12:45
     </div>
 
     <script>
+        document.getElementById("bookingForm").addEventListener("submit", function(event){
+            event.preventDefault();
+            var bookingDetails = document.getElementById("bookingDetails").value;
+
+            fetch('/create-event', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'bookingDetails=' + encodeURIComponent(bookingDetails)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                const contentDisposition = response.headers.get('Content-Disposition');
+                const filenameMatch = /filename="?(.+)"?/.exec(contentDisposition);
+                const filename = (filenameMatch.length > 1) ? filenameMatch[1] : 'download.ics';
+                return response.blob().then(blob => {
+                    return { blob, filename };
+                });
+            })
+            .then(({ blob, filename }) => {
+                var url = window.URL.createObjectURL(blob);
+                var a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+            })
+            .catch(error => {
+                console.error('There has been a problem with your fetch operation:', error);
+                console.log('bookingDetails:', bookingDetails);
+            });
+        });
+        
         document.addEventListener('DOMContentLoaded', (event) => {
             const themeToggle = document.getElementById('theme-toggle');
             themeToggle.addEventListener('change', function() {
                 document.body.classList.toggle('dark-mode', this.checked);
             });
         });
+
     </script>
 </body>
 </html>
