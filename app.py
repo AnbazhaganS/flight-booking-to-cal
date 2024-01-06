@@ -52,7 +52,7 @@ def parse_flight_details(details):
     flight_code_match = re.search(r"([A-Z]{2}\d+)", details)
     flight_code = flight_code_match.group(1) if flight_code_match else "Unknown Flight"
 
-    destination_match = re.search(r"To (.+?) [A-Z]{2}\d+", details)
+    destination_match = re.search(r"Flight to (.+?) [A-Z]{2}\d+", details)
     destination = destination_match.group(1) if destination_match else "Unknown Destination"
 
     # Parse date and times
